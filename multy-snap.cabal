@@ -79,10 +79,14 @@ library
       TypeApplications
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints
   build-depends:
-      base >=4.11 && <10
+      aeson
+    , async
+    , base >=4.11 && <10
     , optparse-simple
     , rio >=0.1.12.0
+    , stm
     , typed-process
+    , yaml
   default-language: Haskell2010
 
 executable multy-snap-exe
@@ -137,11 +141,15 @@ executable multy-snap-exe
       TypeApplications
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.11 && <10
+      aeson
+    , async
+    , base >=4.11 && <10
     , multy-snap
     , optparse-simple
     , rio >=0.1.12.0
+    , stm
     , typed-process
+    , yaml
   default-language: Haskell2010
 
 test-suite multy-snap-test
@@ -198,10 +206,14 @@ test-suite multy-snap-test
       TypeApplications
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.11 && <10
+      aeson
+    , async
+    , base >=4.11 && <10
     , hspec
     , multy-snap
     , optparse-simple
     , rio >=0.1.12.0
+    , stm
     , typed-process
+    , yaml
   default-language: Haskell2010

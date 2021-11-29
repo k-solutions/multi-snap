@@ -7,7 +7,8 @@ module Util
 
 import RIO
  
-testCmds = [ "df -h"
+testCmds = [ "cat /proc/meminfo"
+           , "df -h"
            , "vmstat"
            , "ps -eo pcpu,pid,user,args | sort -k 1 -r | head -10"
            , "docker stats --no-stream"

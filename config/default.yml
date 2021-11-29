@@ -1,0 +1,5 @@
+commands:
+  - "cat /proc/meminfo"
+  - "df -h"
+  - "ps -aux"  
+snap-interval: 100    
