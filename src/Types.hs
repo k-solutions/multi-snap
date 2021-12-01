@@ -14,14 +14,11 @@ data CmdError = CmdError Cmd ByteString
 -- | Command line arguments 
 data Options = Options
   { optionsVerbose :: !Bool
-  , optionsConfigFile :: !FilePath 
   } 
 
 newtype Cmd = Cmd String 
                deriving (Eq, Show, Generic)
 instance FromJSON Cmd -- where
-
-
 
 data PercentVal a = PercentVal
                 { pvVal :: !a
@@ -29,11 +26,11 @@ data PercentVal a = PercentVal
                 , pvMax :: !a 
                 } deriving (Eq, Show)
 
-data Unit = Percent
-          | Kb 
-          | Mb 
-          | Gb 
-          deriving (Eq, Show)
+data DataUnit = Percent
+              | Kb 
+              | Mb 
+              | Gb 
+              deriving (Eq, Show)
 
 data Device = CPU
             | Memory
@@ -43,7 +40,7 @@ data Device = CPU
 data Metrics = Metrics
              { msValue  :: Int 
              , msDevice :: Device
-             , msUnit :: Unit  
+             , msDataUnit :: DataUnit  
              }
 
 -- | 'Result' of the operation
