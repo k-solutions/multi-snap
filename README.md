@@ -1,4 +1,6 @@
 # multy-snap
+
+### NOTE: Work in progress!
     
     Multi-Snap is deamon application, which will take regular snapshots on various point on the machine it will be install on.
   It collects the timestamped data analizing data and give alerts/wornings on critical parameter changings 

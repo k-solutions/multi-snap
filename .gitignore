@@ -1,5 +1,8 @@
 *~
 *.swp
+*.nix
+dist-newstyle/
+result
 tarballs/
 .stack-work/
 .devcontainer/build
