@@ -82,6 +82,7 @@ library
       aeson
     , async
     , base >=4.11 && <10
+    , containers
     , optparse-simple
     , rio >=0.1.12.0
     , stm
@@ -144,6 +145,7 @@ executable multy-snap-exe
       aeson
     , async
     , base >=4.11 && <10
+    , containers
     , multy-snap
     , optparse-simple
     , rio >=0.1.12.0
@@ -209,6 +211,7 @@ test-suite multy-snap-test
       aeson
     , async
     , base >=4.11 && <10
+    , containers
     , hspec
     , multy-snap
     , optparse-simple

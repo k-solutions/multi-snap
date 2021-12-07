@@ -6,9 +6,11 @@ import RIO.Lens
 import Control.Concurrent.STM (TVar)
 import Data.Aeson (withObject)
 import Data.Yaml
+import qualified Data.Map as Map 
+-- import qualified RIO.Prelude as Map
 
 -- | 'Command' error
-data CmdError = CmdError Cmd ByteString
+data CmdError =  CmdError Cmd ByteString
                    deriving (Show, Typeable)
 
 -- | Command line arguments 
@@ -84,4 +86,9 @@ instance HasProcessContext App where
 instance HasConfig App where
   configCtxL = lens appConfig (\x y -> x { appConfig = y })  
 instance HasResult App where
-  resultCtxL = lens appResult (\x y -> x { appResult = y })    
+  resultCtxL = lens appResult (\x y -> x { appResult = y })
+
+--- Helpers --- 
+
+newSnapshot :: Snapshot
+newSnapshot = Map.empty

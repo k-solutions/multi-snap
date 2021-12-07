@@ -25,7 +25,8 @@ main = do
                       "YML Config file"
                       mkConfig
                       configOptions
-  
+ 
+  res <- newTVarIO newSnapshot 
   lo  <- logOptionsHandle stderr (optionsVerbose options)
   pc  <- mkDefaultProcessContext
   cfgRes <- cfgAction

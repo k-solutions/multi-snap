@@ -6,7 +6,7 @@ packages:
 allow-different-user: true
  
 nix:
+  enable: true
   packages:
-      - icu67
       - zlib.dev
       - zlib.out  

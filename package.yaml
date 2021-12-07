@@ -28,6 +28,7 @@ dependencies:
 - aeson
 - yaml  
 - stm
+- containers
 
 default-extensions:
 - ApplicativeDo
