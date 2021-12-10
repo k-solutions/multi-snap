@@ -8,19 +8,25 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs";
     flake-utils.url = "github:numtide/flake-utils";
+    hls = { 
+      url = "github:haskell/haskell-language-server";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };  
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
+  outputs = { self, nixpkgs, flake-utils, hls }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
 
         haskellPackages = pkgs.haskellPackages;
-
+        
         jailbreakUnbreak = pkg:
           pkgs.haskell.lib.doJailbreak (pkg.overrideAttrs (_: { meta = { }; }));
 
-        packageName = "multy-snap";
+          packageName = "multy-snap";
+          
+          hlsFlake = hls.defaultPackage.${system};
       in {
         packages.${packageName} =
           haskellPackages.callCabal2nix packageName self rec {
@@ -31,8 +37,8 @@
 
         devShell = pkgs.mkShell {
           buildInputs = with haskellPackages; [
-            haskell-language-server
-            ghcid
+            hlsFlake
+            stack
             cabal-install
           ];
           inputsFrom = builtins.attrValues self.packages.${system};
