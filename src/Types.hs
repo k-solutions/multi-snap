@@ -6,11 +6,15 @@ import RIO.Lens
 import Control.Concurrent.STM (TVar)
 import Data.Aeson (withObject)
 import Data.Yaml
-import qualified Data.Map as Map 
+import qualified Data.Map as Map
+import qualified RIO.NonEmpty as NonEmpty
+import qualified RIO.Vector as Vector 
+import qualified RIO.Text as Text 
+
 -- import qualified RIO.Prelude as Map
 
--- | 'Command' error
-data CmdError =  CmdError Cmd ByteString
+-- | Command error
+data CmdError = CmdError Cmd ByteString
                    deriving (Show, Typeable)
 
 -- | Command line arguments 
@@ -18,15 +22,11 @@ data Options = Options
   { optionsVerbose :: !Bool
   } 
 
-newtype Cmd = Cmd String 
-               deriving (Eq, Show, Generic)
-instance FromJSON Cmd -- where
-
 data PercentVal a = PercentVal
                 { pvVal :: !a
                 , pvPercent :: !Double
                 , pvMax :: !a 
-                } deriving (Eq, Show)
+                } deriving (Eq,  Show)
 
 data DataUnit = Percent
               | Kb 
@@ -37,30 +37,44 @@ data DataUnit = Percent
 data Device = CPU
             | Memory
             | Disk
-            deriving (Eq, Show)
+            deriving (Eq, Show )
 
 data Metrics = Metrics
-             { msValue  :: Int 
-             , msDevice :: Device
-             , msDataUnit :: DataUnit  
+             { msValue  :: !Int 
+             , msDevice :: !Device
+             , msDataUnit :: !DataUnit  
              }
 
 -- | 'Result' of the operation
 newtype Result = Result (NonEmpty Metrics)
 
-type CmdList = [Cmd]
+data Cmd = Cmd 
+         { cmdShell :: !Text
+         , cmdArgs  :: [Text] 
+         } deriving (Eq, Show, Generic)
+-- instance FromJSON Cmd -- where
+-- | Custom JSON parser for Cmd
+parseCmd :: Value -> Parser (Maybe Cmd)
+parseCmd = withText "command" (pure . arrToCmd . Text.words) 
+-- parseCmd (Array arr) = pure . arrToCmd $ arr
+
+newtype CmdList = CmdList (NonEmpty Cmd)
+                  deriving (Eq, Show)
+instance FromJSON CmdList where
+  parseJSON = withArray "commands" (toCmdList . Vector.toList)    
+                   
 type Snapshot = Map Cmd Result
 type CmdResult = Either [CmdError] Snapshot
 
--- | 'Config' data comming form application config 
+-- | Config data comming form application config 
 data Config = Config
-            { cfgCommands :: CmdList
+            { cfgCommands :: !CmdList
             , cfgSnapInterval :: !Int    --- in seconds 
             } deriving (Eq, Show)
 instance FromJSON Config where
     parseJSON = withObject "Config"$ \o -> Config
-      <$> o .: "commands"
-      <*> o .: "snap-interval"
+              <$> o .: "commands" 
+              <*> o .: "snap-interval"
 
 cfgCmdsL :: Lens' Config CmdList
 cfgCmdsL = lens cfgCommands (\x y -> x {cfgCommands = y})
@@ -72,8 +86,8 @@ data App = App
   , appConfig :: !Config
   , appResult :: TVar CmdResult 
   }
-
-class HasConfig env where
+      
+class HasConfig env where 
     configCtxL :: Lens' env Config
 
 class HasResult env where
@@ -89,6 +103,20 @@ instance HasResult App where
   resultCtxL = lens appResult (\x y -> x { appResult = y })
 
 --- Helpers --- 
+
+toCmdList :: [Value] -> Parser CmdList
+toCmdList vs = do
+    mCmds <- mapM parseCmd vs
+    let cmds = catMaybes mCmds
+    case NonEmpty.nonEmpty cmds of
+      Just nCmds -> pure . CmdList $ nCmds
+      Nothing    -> fail " empty commands list" 
+
+arrToCmd :: [Text] -> Maybe Cmd
+arrToCmd arr = case arr of
+                 (cmd:args) -> Just $ Cmd cmd args
+                 [cmd]      -> Just $ Cmd cmd []
+                 _          -> Nothing 
 
 newSnapshot :: Snapshot
 newSnapshot = Map.empty

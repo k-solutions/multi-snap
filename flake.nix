@@ -1,47 +1,41 @@
-# SPDX-FileCopyrightText: 2021 Serokell <https://serokell.io/>
-#
-# SPDX-License-Identifier: CC0-1.0
-
 {
-  description = "Multy-snap is tool to execute multiple system tools and collect and analyze results";
-
-  inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs";
-    flake-utils.url = "github:numtide/flake-utils";
-    hls = { 
-      url = "github:haskell/haskell-language-server";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };  
-  };
-
-  outputs = { self, nixpkgs, flake-utils, hls }:
-    flake-utils.lib.eachDefaultSystem (system:
-      let
-        pkgs = nixpkgs.legacyPackages.${system};
-
-        haskellPackages = pkgs.haskellPackages;
-        
-        jailbreakUnbreak = pkg:
-          pkgs.haskell.lib.doJailbreak (pkg.overrideAttrs (_: { meta = { }; }));
-
-          packageName = "multy-snap";
-          
-          hlsFlake = hls.defaultPackage.${system};
-      in {
-        packages.${packageName} =
-          haskellPackages.callCabal2nix packageName self rec {
-            # Dependency overrides go here
-          };
-
-        defaultPackage = self.packages.${system}.${packageName};
-
-        devShell = pkgs.mkShell {
-          buildInputs = with haskellPackages; [
-            hlsFlake
-            stack
-            cabal-install
-          ];
-          inputsFrom = builtins.attrValues self.packages.${system};
-        };
-      });
+  description = "A very basic flake";
+  inputs.haskellNix.url = "github:input-output-hk/haskell.nix";
+  inputs.nixpkgs.follows = "haskellNix/nixpkgs-unstable";
+  inputs.flake-utils.url = "github:numtide/flake-utils";
+  outputs = { self, nixpkgs, flake-utils, haskellNix }:
+    flake-utils.lib.eachSystem [ "x86_64-linux" "x86_64-darwin" ] (system:
+    let
+      overlays = [ haskellNix.overlay
+        (final: prev: {
+          # This overlay adds our project to pkgs
+          helloProject =
+            final.haskell-nix.project' {
+              src = ./.;
+              compiler-nix-name = "ghc8107";
+              # This is used by `nix develop .` to open a shell for use with
+              # `cabal`, `hlint` and `haskell-language-server`
+              shell.tools = {
+                cabal = {};
+                hlint = {};
+                haskell-language-server = {};
+              };
+              # Non-Haskell shell tools go here
+              shell.buildInputs = with pkgs; [
+                nixpkgs-fmt
+              ];
+              # This adds `js-unknown-ghcjs-cabal` to the shell.
+              # shell.crossPlatform = p: [p.ghcjs];
+            };
+        })
+      ];
+      pkgs = import nixpkgs { inherit system overlays; inherit (haskellNix) config; };
+      flake = pkgs.helloProject.flake {
+        # This adds support for `nix build .#js-unknown-ghcjs-cabal:hello:exe:hello`
+        # crossPlatforms = p: [p.ghcjs];
+      };
+    in flake // {
+      # Built by `nix build .`
+      defaultPackage = flake.packages."multy-snap:exe:multy-snap";
+    });
 }

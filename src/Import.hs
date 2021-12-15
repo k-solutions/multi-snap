@@ -7,13 +7,13 @@ module Import
 import RIO
 import Types
 import Data.Yaml
-import Data.Yaml.Config 
+-- import Data.Yaml.Config 
 
 mkConfig ::  FilePath 
           -> IO (Either (FilePath, String) Config)
 mkConfig file = do  
-   res <- tryAny $ loadYamlSettings [file] [] useEnv
+   res <- decodeFileEither file 
    pure $ case res of
-     Left e -> Left (file, displayException e)
-     Right cfg@Config {..}            -> Right cfg 
+     Left e              -> Left (file, displayException e)
+     Right cfg@Config {} -> Right cfg 
 

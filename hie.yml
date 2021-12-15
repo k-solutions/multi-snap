@@ -1,0 +1,8 @@
+cradle:
+  cabal:
+    component: multy-snap-exe      
+
+dependencies:
+  - package.yaml
+  - shell.nix
+  - default.nix

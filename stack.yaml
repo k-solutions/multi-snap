@@ -1,4 +1,4 @@
-resolver: lts-18.16
+resolver: lts-18.18
 
 packages:
 - .
@@ -8,5 +8,6 @@ allow-different-user: true
 nix:
   enable: true
   packages:
+      - icu67
       - zlib.dev
       - zlib.out  
