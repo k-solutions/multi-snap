@@ -2,10 +2,10 @@ module Run (run) where
 
 import Import
 import Data.Semigroup (Endo(appEndo))
-import RIO.Process hiding (proc)   -- (HasProcessContext(processContextL))
+import RIO.Process -- (HasProcessContext(processContextL))
 import Types
 import qualified RIO.Text as Text
-import System.Process.Typed (proc)
+-- import System.Process.Typed (proc)
 
 
 run :: RIO App ()
@@ -22,5 +22,5 @@ runCmds = do
     forConcurrently_ cfgCmds $ \(Cmd cmd args) -> do
         let cmdStr  = Text.unpack cmd
             argsStr = map Text.unpack args 
-        extCode <- runProcess $ proc cmdStr argsStr  
+        extCode <- proc cmdStr argsStr runProcess 
         logInfo $ "Process exit code: " <> displayShow extCode
