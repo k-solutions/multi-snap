@@ -158,7 +158,7 @@ test-suite multy-snap-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      UtilSpec
+      TypesSpec
       Paths_multy_snap
   hs-source-dirs:
       test
@@ -215,6 +215,7 @@ test-suite multy-snap-test
     , hspec
     , multy-snap
     , optparse-simple
+    , raw-strings-qq
     , rio >=0.1.12.0
     , stm
     , typed-process

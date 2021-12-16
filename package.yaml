@@ -107,6 +107,7 @@ tests:
     dependencies:
     - multy-snap
     - hspec
+    - raw-strings-qq
 
     ghc-options:
     - -threaded

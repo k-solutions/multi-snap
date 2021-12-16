@@ -52,16 +52,15 @@ data Cmd = Cmd
          { cmdShell :: !Text
          , cmdArgs  :: [Text] 
          } deriving (Eq, Show, Generic)
--- instance FromJSON Cmd -- where
+
 -- | Custom JSON parser for Cmd
 parseCmd :: Value -> Parser (Maybe Cmd)
 parseCmd = withText "command" (pure . arrToCmd . Text.words) 
--- parseCmd (Array arr) = pure . arrToCmd $ arr
 
 newtype CmdList = CmdList (NonEmpty Cmd)
                   deriving (Eq, Show)
 instance FromJSON CmdList where
-  parseJSON = withArray "commands" (toCmdList . Vector.toList)    
+   parseJSON = withArray "commands" (toCmdList . Vector.toList)    
                    
 type Snapshot = Map Cmd Result
 type CmdResult = Either [CmdError] Snapshot
@@ -114,8 +113,8 @@ toCmdList vs = do
 
 arrToCmd :: [Text] -> Maybe Cmd
 arrToCmd arr = case arr of
-                 (cmd:args) -> Just $ Cmd cmd args
                  [cmd]      -> Just $ Cmd cmd []
+                 (cmd:args) -> Just $ Cmd cmd args
                  _          -> Nothing 
 
 newSnapshot :: Snapshot
